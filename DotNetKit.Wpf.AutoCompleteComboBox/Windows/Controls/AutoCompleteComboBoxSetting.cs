@@ -1,7 +1,37 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace DotNetKit.Windows.Controls
 {
+    public static class MyStringExtensions
+    {
+        public static bool Like(this string toSearch, string toFind)
+        {
+            string regexPattern = Regex.Replace(
+                                                    toFind,
+                                                    @"[%_]|\[[^]]*\]|[^%_[]+",
+                                                    match =>
+                                                    {
+                                                        if (match.Value == "%")
+                                                        {
+                                                            return ".*";
+                                                        }
+                                                        if (match.Value == "_")
+                                                        {
+                                                            return ".";
+                                                        }
+                                                        if (match.Value.StartsWith("[") && match.Value.EndsWith("]"))
+                                                        {
+                                                            return match.Value;
+                                                        }
+                                                        return Regex.Escape(match.Value);
+                                                    });
+
+            bool result = Regex.IsMatch(toSearch, regexPattern, RegexOptions.IgnoreCase);
+            return result;
+        }
+    }
+
     /// <summary>
     /// Represents an object to configure <see cref="AutoCompleteComboBox"/>.
     /// </summary>
@@ -22,7 +52,8 @@ namespace DotNetKit.Windows.Controls
         /// <returns></returns>
         public virtual Predicate<object> GetFilter(string query, Func<object, string> stringFromItem)
         {
-            return item => stringFromItem(item).IndexOf(query, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            //return item => stringFromItem(item).IndexOf(query, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            return item => stringFromItem(item).Like(query) == true;
         }
 
         /// <summary>
@@ -44,7 +75,7 @@ namespace DotNetKit.Windows.Controls
         /// </summary>
         public virtual TimeSpan Delay
         {
-            get { return TimeSpan.FromMilliseconds(300.0); }
+            get { return TimeSpan.FromMilliseconds(100.0); }
         }
 
         static AutoCompleteComboBoxSetting @default = new AutoCompleteComboBoxSetting();
