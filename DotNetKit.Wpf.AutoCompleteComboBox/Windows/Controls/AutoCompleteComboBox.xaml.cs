@@ -174,7 +174,14 @@ namespace DotNetKit.Windows.Controls
             else if (SelectedItem != null && TextFromItem(SelectedItem) == text)
             {
                 // It seems the user selected an item.
-                // Do nothing.
+                // //Do nothing.
+                // Clear filter for sugestion list.
+
+                using (Items.DeferRefresh())
+                {
+                    Items.Filter = defaultItemsFilter;
+                }
+
             }
             else
             {
