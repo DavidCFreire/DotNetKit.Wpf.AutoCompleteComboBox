@@ -48,7 +48,7 @@ namespace DotNetKit.Windows.Controls
 
             var d = new DependencyVariable<string>();
             d.SetBinding(item, TextSearch.GetTextPath(this));
-            return d.Value ?? string.Empty;
+            return d.Value.Replace(" ", "%") ?? string.Empty;
         }
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
@@ -157,6 +157,7 @@ namespace DotNetKit.Windows.Controls
         {
             var text = Text;
 
+            text = text.Replace(" ", "%");
             if (text == previousText) return;
             previousText = text;
 
@@ -232,7 +233,7 @@ namespace DotNetKit.Windows.Controls
 
         Predicate<object> GetFilter()
         {
-            var filter = SettingOrDefault.GetFilter(Text, TextFromItem);
+            var filter = SettingOrDefault.GetFilter(Text.Replace(" ", "%"), TextFromItem);
 
             return defaultItemsFilter != null
                 ? i => defaultItemsFilter(i) && filter(i)
