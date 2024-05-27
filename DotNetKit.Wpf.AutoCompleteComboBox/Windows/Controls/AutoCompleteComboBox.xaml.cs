@@ -48,7 +48,22 @@ namespace DotNetKit.Windows.Controls
 
             var d = new DependencyVariable<string>();
             d.SetBinding(item, TextSearch.GetTextPath(this));
-            return d.Value.Replace(" ", "%") ?? string.Empty;
+            var val = d.Value;
+            if (string.IsNullOrEmpty(val))
+            {
+                return string.Empty;
+            }
+            else
+            {
+                try
+                {
+                    return val.Replace(" ", "%") ?? string.Empty;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
         }
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
