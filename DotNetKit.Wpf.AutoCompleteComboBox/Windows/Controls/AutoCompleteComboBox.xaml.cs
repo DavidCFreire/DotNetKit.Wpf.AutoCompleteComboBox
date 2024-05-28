@@ -10,6 +10,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using DotNetKit.Misc.Disposables;
 using DotNetKit.Windows.Media;
+using System.Runtime.InteropServices;
 
 namespace DotNetKit.Windows.Controls
 {
@@ -72,6 +73,39 @@ namespace DotNetKit.Windows.Controls
 
             defaultItemsFilter = newValue is ICollectionView cv ? cv.Filter : null;
         }
+
+        #region HideCursorWhenDropIsOpen
+        static DependencyProperty HideCursorWhenDropIsOpenProperty =
+    DependencyProperty.Register(
+        nameof(HideCursorWhenDropIsOpen),
+        typeof(bool),
+        typeof(AutoCompleteComboBox)
+    );
+
+        public bool HideCursorWhenDropIsOpen
+        {
+            get { return (bool)GetValue(HideCursorWhenDropIsOpenProperty); }
+            set { SetValue(HideCursorWhenDropIsOpenProperty, value); }
+        }
+
+        #endregion
+
+        #region ResetSuggestionListAfterSelect
+        static DependencyProperty ResetSuggestionListAfterSelectProperty =
+    DependencyProperty.Register(
+        nameof(ResetSuggestionListAfterSelect),
+        typeof(bool),
+        typeof(AutoCompleteComboBox),
+        new PropertyMetadata(true)
+    );
+
+        public bool ResetSuggestionListAfterSelect
+        {
+            get { return (bool)GetValue(ResetSuggestionListAfterSelectProperty); }
+            set { SetValue(ResetSuggestionListAfterSelectProperty, value); }
+        }
+
+        #endregion
 
         #region Setting
         static readonly DependencyProperty settingProperty =
@@ -155,8 +189,22 @@ namespace DotNetKit.Windows.Controls
             }
         }
 
+        private void SetPosition(int a, int b)
+        {
+            SetCursorPos(a, b);
+        }
+
+        [DllImport("User32.dll")]
+        private static extern bool SetCursorPos(int X, int Y);
+
+
         void OpenDropDown(Predicate<object> filter)
         {
+            if (HideCursorWhenDropIsOpen && this.IsKeyboardFocusWithin)
+            {
+                SetCursorPos(0, 0);
+            }
+
             UpdateFilter(filter);
             IsDropDownOpen = true;
             Unselect();
@@ -192,9 +240,12 @@ namespace DotNetKit.Windows.Controls
                 // //Do nothing.
                 // Clear filter for sugestion list.
 
-                using (Items.DeferRefresh())
+                if (ResetSuggestionListAfterSelect)
                 {
-                    Items.Filter = defaultItemsFilter;
+                    using (Items.DeferRefresh())
+                    {
+                        Items.Filter = defaultItemsFilter;
+                    }
                 }
 
             }
