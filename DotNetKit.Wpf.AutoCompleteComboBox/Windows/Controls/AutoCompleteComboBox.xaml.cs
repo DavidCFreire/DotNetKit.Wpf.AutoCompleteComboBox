@@ -333,8 +333,14 @@ namespace DotNetKit.Windows.Controls
 
         Predicate<object> GetFilter()
         {
+            string t = Text;
 
-            var filter = SettingOrDefault.GetFilter(EspaceAsLike ? Text.Replace(" ", "%") : Text, TextFromItem);
+            if(EspaceAsLike)
+            {
+                t = t.Replace(" ", "%");
+            }
+
+            var filter = SettingOrDefault.GetFilter(t, TextFromItem);
 
             return defaultItemsFilter != null
                 ? i => defaultItemsFilter(i) && filter(i)
