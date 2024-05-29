@@ -58,7 +58,14 @@ namespace DotNetKit.Windows.Controls
             {
                 try
                 {
-                    return val.Replace(" ", "%") ?? string.Empty;
+                    if (EspaceAsLike)
+                    {
+                        return val.Replace(" ", "%") ?? string.Empty;
+                    }
+                    else
+                    {
+                        return val ?? string.Empty;
+                    }
                 }
                 catch
                 {
@@ -73,6 +80,22 @@ namespace DotNetKit.Windows.Controls
 
             defaultItemsFilter = newValue is ICollectionView cv ? cv.Filter : null;
         }
+
+        #region EspaceAsLike
+        static DependencyProperty EspaceAsLikeProperty =
+    DependencyProperty.Register(
+        nameof(EspaceAsLike),
+        typeof(bool),
+        typeof(AutoCompleteComboBox)
+    );
+
+        public bool EspaceAsLike
+        {
+            get { return (bool)GetValue(EspaceAsLikeProperty); }
+            set { SetValue(EspaceAsLikeProperty, value); }
+        }
+
+        #endregion
 
         #region HideCursorWhenDropIsOpen
         static DependencyProperty HideCursorWhenDropIsOpenProperty =
@@ -220,7 +243,11 @@ namespace DotNetKit.Windows.Controls
         {
             var text = Text;
 
-            text = text.Replace(" ", "%");
+            if (EspaceAsLike)
+            {
+                text = text.Replace(" ", "%");
+            }
+
             if (text == previousText) return;
             previousText = text;
 
@@ -306,7 +333,8 @@ namespace DotNetKit.Windows.Controls
 
         Predicate<object> GetFilter()
         {
-            var filter = SettingOrDefault.GetFilter(Text.Replace(" ", "%"), TextFromItem);
+
+            var filter = SettingOrDefault.GetFilter(EspaceAsLike ? Text.Replace(" ", "%") : Text, TextFromItem);
 
             return defaultItemsFilter != null
                 ? i => defaultItemsFilter(i) && filter(i)
