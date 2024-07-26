@@ -119,7 +119,7 @@ namespace DotNetKit.Windows.Controls
         nameof(ResetSuggestionListAfterSelect),
         typeof(bool),
         typeof(AutoCompleteComboBox),
-        new PropertyMetadata(true)
+        new PropertyMetadata(false)
     );
 
         public bool ResetSuggestionListAfterSelect
@@ -266,6 +266,7 @@ namespace DotNetKit.Windows.Controls
                 // It seems the user selected an item.
                 // //Do nothing.
                 // Clear filter for sugestion list.
+
 
                 if (ResetSuggestionListAfterSelect)
                 {
