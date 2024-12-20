@@ -239,8 +239,10 @@ namespace DotNetKit.Windows.Controls
             OpenDropDown(filter);
         }
 
+
         void UpdateSuggestionList()
         {
+            var caretIndex = EditableTextBox.SelectionStart;
             var text = Text;
 
             if (EspaceAsLike)
@@ -293,6 +295,8 @@ namespace DotNetKit.Windows.Controls
                     OpenDropDown(filter);
                 }
             }
+            EditableTextBox.SelectionStart = caretIndex;
+
         }
 
         void OnTextChanged(object sender, TextChangedEventArgs e)
